@@ -11,3 +11,6 @@
 *.lai
 *.la
 *.a
+
+# qwt user file
+*.user
