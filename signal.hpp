@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <memory>
+#include <QVector>
 
 #include <SFML/Audio/SoundBuffer.hpp>
 //#include <SFML/Audio/Sound.hpp>
@@ -24,9 +25,11 @@ public:
 
     void setFftSize(size_t length);
     std::shared_ptr< Aquila::Fft > getFft();
+    QVector< QVector<double> > getSpectrum();
 
 protected:
     void fftInitialize();
+    size_t m_fftSize;
     std::shared_ptr< Aquila::Fft > m_fft;
 };
 

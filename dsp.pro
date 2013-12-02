@@ -19,11 +19,9 @@ QMAKE_CXXFLAGS = -std=c++0x
 SOURCES += main.cpp\
         mainwindow.cpp \
     ../aquila-src/lib/ooura/fft4g.c \
-    signal.cpp \
-    customwindow.cpp
+    signal.cpp
 
 HEADERS  += mainwindow.h \
-    signal.hpp \
-    customwindow.hpp
+    signal.hpp
 
 FORMS    += mainwindow.ui

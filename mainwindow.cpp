@@ -30,7 +30,7 @@ void MainWindow::paintSignal(const Aquila::SignalSource& source, size_t sampleRa
 
     curvSignal = new QwtPlotCurve(QString("A(t)"));
     curvSignal->setRenderHint(QwtPlotItem::RenderAntialiased);
-    curvSignal->setPen(/*QPen(Qt::green)*/ QRgb(0xff427dd3));
+    curvSignal->setPen(QRgb(0xff427dd3));
 
     QVector<double> x;
     QVector<double> y;
@@ -114,4 +114,16 @@ void MainWindow::on_buttonFile_clicked()
     Signal s;
     s.loadFromFile(m_fileName.toStdString());
     paintSignal(s, s.getSampleRate());
+
+    spectrogram = new QwtPlotSpectrogram;
+    FftSpectrumData * r = new FftSpectrumData();
+    r->setInterval(Qt::XAxis, QwtInterval(0., s.getDuration().asSeconds()));
+    r->setInterval(Qt::YAxis, QwtInterval(0., s.getSampleRate()));
+    r->setFft(s.getSpectrum());
+
+    spectrogram->setColorMap( new ColorMap() );
+    spectrogram->setData(r);
+
+    spectrogram->attach(ui->plotSpectrum);
+    ui->plotSpectrum->replot();
 }

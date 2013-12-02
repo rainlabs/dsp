@@ -1,8 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
 #include <iostream>
+#include <QMainWindow>
+#include <QFileDialog>
 
 #include <qwt_plot_canvas.h>
 #include <qwt_legend.h>
@@ -13,24 +14,35 @@
 #include <qwt_raster_data.h>
 #include <qwt_color_map.h>
 #include <qwt_plot_spectrogram.h>
-#include <QFileDialog>
 
 #include "signal.hpp"
 
-class RasterData: public QwtRasterData
+class FftSpectrumData: public QwtRasterData
 {
 public:
-    RasterData()
+    FftSpectrumData()
     {
-        setInterval( Qt::XAxis, QwtInterval( -3.0, 3.0 ) );
-        setInterval( Qt::YAxis, QwtInterval( -3.0, 3.0 ) );
-        setInterval( Qt::ZAxis, QwtInterval( 0.0, 10.0 ) );
+        index = 0;
+        setInterval(Qt::ZAxis, QwtInterval(0., 10.));
     }
 
     virtual double value( double x, double y ) const
     {
-       return  ( cos(x*x) + y*y);
+        if (index >= m_fft.size() || m_fft[index].size() == 0) {
+            index = 0;
+            return 0.;
+        }
+        return m_fft[index++].back();
     }
+
+    void setFft(QVector< QVector<double> > v)
+    {
+        m_fft = v;
+    }
+
+protected:
+    mutable int index;
+    QVector< QVector<double> > m_fft;
 };
 
 class ColorMap: public QwtLinearColorMap
