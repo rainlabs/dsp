@@ -115,11 +115,15 @@ void MainWindow::on_buttonFile_clicked()
     s.loadFromFile(m_fileName.toStdString());
     paintSignal(s, s.getSampleRate());
 
+    QVector< QVector3D > map = s.getSpectrum();
+
     spectrogram = new QwtPlotSpectrogram;
     FftSpectrumData * r = new FftSpectrumData();
-    r->setInterval(Qt::XAxis, QwtInterval(0., s.getDuration().asSeconds()));
-    r->setInterval(Qt::YAxis, QwtInterval(0., s.getSampleRate()));
-    r->setFft(s.getSpectrum());
+    r->setInterval(Qt::XAxis, QwtInterval(0., map.back().x()));
+    r->setInterval(Qt::YAxis, QwtInterval(0., map.back().y()));
+    r->setData( map );
+
+    std::cout << map.back().x() << ";" << map.back().y() << ";" << map.back().z();
 
     spectrogram->setColorMap( new ColorMap() );
     spectrogram->setData(r);

@@ -2,8 +2,10 @@
 #define Signal_HPP
 
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <QVector>
+#include <QVector3D>
 
 #include <SFML/Audio/SoundBuffer.hpp>
 //#include <SFML/Audio/Sound.hpp>
@@ -11,6 +13,7 @@
 #include <aquila/source/generator/SineGenerator.h>
 
 #include <aquila/transform/FftFactory.h>
+#include <aquila/source/window/BlackmanWindow.h>
 
 /**
  * @brief The Signal class as sound buffer and sine or WhiteNoise generator
@@ -24,13 +27,12 @@ public:
     bool loadFromFile(const std::string& filename);
 
     void setFftSize(size_t length);
-    std::shared_ptr< Aquila::Fft > getFft();
-    QVector< QVector<double> > getSpectrum();
+    void setOverlapSize(size_t length);
+    QVector< QVector3D > getSpectrum();
 
 protected:
     void fftInitialize();
-    size_t m_fftSize;
-    std::shared_ptr< Aquila::Fft > m_fft;
+    size_t m_fftSize, m_overlapSize;
 };
 
 #endif // Signal_HPP

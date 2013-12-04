@@ -17,27 +17,63 @@ bool Signal::loadFromFile(const std::string& filename)
 void Signal::setFftSize(size_t length)
 {
     m_fftSize = length;
-    m_fft = Aquila::FftFactory::getFft(length);
 }
 
-std::shared_ptr< Aquila::Fft > Signal::getFft()
-{
-    return m_fft;
+void Signal::setOverlapSize(size_t length)
+{float
+    m_overlapSize = length;
 }
 
-QVector< QVector<double> > Signal::getSpectrum()
+QVector< QVector3D > Signal::getSpectrum()
 {
-    QVector< QVector<double> > result;
+    QVector< QVector3D > result;
 
-    for(int i = 0; i < m_data.size(); i += m_fftSize) {
-        if (i + m_fftSize >= m_data.size())
-            break;
-        Aquila::SpectrumType fft =  m_fft->fft(toArray()+i);
-        QVector<double> temp;
-        for(auto v : fft) {
-            temp.push_back( v.real() );
+    auto fft      = Aquila::FftFactory::getFft(m_fftSize);
+    auto * window = new Aquila::BlackmanWindow(m_fftSize);
+
+    // TODO if m_data.size() < window.size()
+
+    int ncol = (int) (m_data.size() - m_overlapSize) / (m_fftSize - m_overlapSize);
+    QVector< int > colIndex, rowIndex;
+
+    for(int i = 0; i < ncol; i++) {
+        colIndex.push_back( i * (m_fftSize - m_overlapSize) + 1 );
+    }
+
+    for(int i = 1; i <= m_fftSize; i++) {
+        rowIndex.push_back( i );
+    }
+
+//    if (m_data.size() < (m_fftSize + colIndex[ncol] - 1)) {
+//        m_data[m_fftSize + colIndex[ncol] - 1] = 0;
+//    }
+
+    QVector< double > fftInput(m_fftSize, 0.);
+    QVector< Aquila::SpectrumType > fftValues;
+
+    for(int i = 0; i < ncol; i++) {
+        for(int j = 0; j < m_fftSize; j++) {
+            fftInput[j] = m_data[colIndex[i] + rowIndex[j] - 1] * window->toArray()[j];
         }
-        result.push_back( temp );
+        fftValues.push_back( fft->fft(fftInput.constData()) );
+    }
+    size_t select = m_fftSize / 2 + 1;
+    for(int i = 0; i < fftValues.size(); i++) {
+        fftValues[i].resize(select);
+    }
+
+    QVector< float > f, t;
+    for(int i = 0; i < select; i++) {
+        f.push_back( 2. / m_fftSize * i );
+    }
+    for(auto i : colIndex) {
+        t.push_back( (i - 1) / 2. );
+    }
+
+    for(int i = 0; i < fftValues.size(); i++) {
+        for(int j = 0; j < fftValues[i].size(); j++) {
+            result.push_back( QVector3D(t[i], f[j], 20. * log10(std::abs(fftValues[i][j] + 0.000001))) );
+        }
     }
 
     return result;
@@ -47,6 +83,6 @@ QVector< QVector<double> > Signal::getSpectrum()
 
 void Signal::fftInitialize()
 {
-    m_fftSize = 128;
-    m_fft = Aquila::FftFactory::getFft(m_fftSize);
+    m_fftSize = 256;
+    m_overlapSize = 128;
 }
