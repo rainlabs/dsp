@@ -34,14 +34,11 @@ QVector< QVector3D > Signal::getSpectrum()
     // TODO if m_data.size() < window.size()
 
     int ncol = (int) (m_data.size() - m_overlapSize) / (m_fftSize - m_overlapSize);
-    QVector< int > colIndex, rowIndex;
+    QVector< int > colIndex;
 
+    // TODO remove it
     for(int i = 0; i < ncol; i++) {
         colIndex.push_back( i * (m_fftSize - m_overlapSize) + 1 );
-    }
-
-    for(int i = 1; i <= m_fftSize; i++) {
-        rowIndex.push_back( i );
     }
 
 //    if (m_data.size() < (m_fftSize + colIndex[ncol] - 1)) {
@@ -53,10 +50,11 @@ QVector< QVector3D > Signal::getSpectrum()
 
     for(int i = 0; i < ncol; i++) {
         for(int j = 0; j < m_fftSize; j++) {
-            fftInput[j] = m_data[colIndex[i] + rowIndex[j] - 1] * window->toArray()[j];
+            fftInput[j] = m_data[colIndex[i] + j] * window->toArray()[j];
         }
         fftValues.push_back( fft->fft(fftInput.constData()) );
     }
+    // select only non-overlapped values
     size_t select = m_fftSize / 2 + 1;
     for(int i = 0; i < fftValues.size(); i++) {
         fftValues[i].resize(select);
@@ -75,6 +73,28 @@ QVector< QVector3D > Signal::getSpectrum()
             result.push_back( QVector3D(t[i], f[j], 20. * log10(std::abs(fftValues[i][j] + 0.000001))) );
         }
     }
+
+    std::fstream file;
+    file.open("/home/rain/t.data", std::ios::out | std::ios::trunc);
+    for(auto val : t) {
+        file << val << " ";
+    }
+    file.close();
+
+    file.open("/home/rain/f.data", std::ios::out | std::ios::trunc);
+    for(auto val : f) {
+        file << val << " ";
+    }
+    file.close();
+
+    file.open("/home/rain/fft.data", std::ios::out | std::ios::trunc);
+    for(auto vec : fftValues) {
+        for(auto val : vec) {
+            file << 20. * log10(std::abs(val + 0.000001)) << " ";
+        }
+        file << std::endl;
+    }
+    file.close();
 
     return result;
 }

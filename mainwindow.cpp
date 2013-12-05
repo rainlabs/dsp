@@ -8,13 +8,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     initializePlots();
 
-//    spectrogram = new QwtPlotSpectrogram;
-
-//    spectrogram->setColorMap( new ColorMap() );
-//    spectrogram->setData(new RasterData());
-
-//    spectrogram->attach(ui->plotSpectrum);
-//    ui->plotSpectrum->replot();
+    ui->textSize->setText("256");
+    ui->textOverlap->setText("128");
 }
 
 MainWindow::~MainWindow()
@@ -115,6 +110,8 @@ void MainWindow::on_buttonFile_clicked()
     s.loadFromFile(m_fileName.toStdString());
     paintSignal(s, s.getSampleRate());
 
+    s.setFftSize( ui->textSize->toPlainText().toInt() );
+    s.setOverlapSize( ui->textOverlap->toPlainText().toInt() );
     QVector< QVector3D > map = s.getSpectrum();
 
     spectrogram = new QwtPlotSpectrogram;
@@ -125,9 +122,9 @@ void MainWindow::on_buttonFile_clicked()
 
     std::cout << map.back().x() << ";" << map.back().y() << ";" << map.back().z();
 
-    spectrogram->setColorMap( new ColorMap() );
-    spectrogram->setData(r);
+//    spectrogram->setColorMap( new ColorMap() );
+//    spectrogram->setData(r);
 
-    spectrogram->attach(ui->plotSpectrum);
-    ui->plotSpectrum->replot();
+//    spectrogram->attach(ui->plotSpectrum);
+//    ui->plotSpectrum->replot();
 }
