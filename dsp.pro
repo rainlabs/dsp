@@ -19,9 +19,11 @@ QMAKE_CXXFLAGS = -std=c++0x
 SOURCES += main.cpp\
         mainwindow.cpp \
     ../aquila-src/lib/ooura/fft4g.c \
-    signal.cpp
+    signal.cpp \
+    BlackmanHarrisWindow.cpp
 
 HEADERS  += mainwindow.h \
-    signal.hpp
+    signal.hpp \
+    BlackmanHarrisWindow.hpp
 
 FORMS    += mainwindow.ui

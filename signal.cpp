@@ -30,6 +30,7 @@ QVector< QVector3D > Signal::getSpectrum()
 
     auto fft      = Aquila::FftFactory::getFft(m_fftSize);
     auto * window = new Aquila::BlackmanWindow(m_fftSize);
+//    auto * window = new Aquila::BlackmanHarrisWindow(m_fftSize);
 
     // TODO if m_data.size() < window.size()
 

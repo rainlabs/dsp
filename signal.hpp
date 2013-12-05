@@ -15,6 +15,8 @@
 #include <aquila/transform/FftFactory.h>
 #include <aquila/source/window/BlackmanWindow.h>
 
+#include <BlackmanHarrisWindow.hpp>
+
 /**
  * @brief The Signal class as sound buffer and sine or WhiteNoise generator
  */
